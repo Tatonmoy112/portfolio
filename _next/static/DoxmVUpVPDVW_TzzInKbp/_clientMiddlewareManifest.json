@@ -1,0 +1,10 @@
+[
+  {
+    "regexp": "^\\/portfolio(?:\\/(_next\\/data\\/[^/]{1,}))?\\/studio(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(\\\\.json)?[\\/#\\?]?$",
+    "originalSource": "/studio/:path*"
+  },
+  {
+    "regexp": "^\\/portfolio(?:\\/(_next\\/data\\/[^/]{1,}))?\\/login\\/studio(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(\\\\.json)?[\\/#\\?]?$",
+    "originalSource": "/login/studio/:path*"
+  }
+]
