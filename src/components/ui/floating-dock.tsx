@@ -1,6 +1,5 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { PanelBottomClose } from "lucide-react";
 import {
     AnimatePresence,
     MotionValue,
@@ -23,66 +22,14 @@ export const FloatingDock = ({
 }) => {
     return (
         <>
-            <FloatingDockDesktop items={items} className={desktopClassName} />
-            <FloatingDockMobile items={items} className={mobileClassName} />
+            <>
+                <FloatingDockDesktop items={items} className={desktopClassName} />
+            </>
         </>
     );
 };
 
-const FloatingDockMobile = ({
-    items,
-    className,
-}: {
-    items: { title: string; icon: React.ReactNode; href: string }[];
-    className?: string;
-}) => {
-    const [open, setOpen] = useState(false);
-    return (
-        <div className={cn("relative block md:hidden", className)}>
-            <AnimatePresence>
-                {open && (
-                    <motion.div
-                        layoutId="nav"
-                        className="absolute bottom-full mb-2 inset-x-0 flex flex-col gap-2"
-                    >
-                        {items.map((item, idx) => (
-                            <motion.div
-                                key={item.title}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                }}
-                                exit={{
-                                    opacity: 0,
-                                    y: 10,
-                                    transition: {
-                                        delay: idx * 0.05,
-                                    },
-                                }}
-                                transition={{ delay: (items.length - 1 - idx) * 0.05 }}
-                            >
-                                <Link
-                                    href={item.href}
-                                    key={item.title}
-                                    className="h-10 w-10 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center"
-                                >
-                                    <div className="h-4 w-4">{item.icon}</div>
-                                </Link>
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-            <button
-                onClick={() => setOpen(!open)}
-                className="h-10 w-10 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center"
-            >
-                <PanelBottomClose className="h-5 w-5 text-neutral-400" />
-            </button>
-        </div>
-    );
-};
+
 
 const FloatingDockDesktop = ({
     items,
@@ -97,7 +44,7 @@ const FloatingDockDesktop = ({
             onMouseMove={(e) => mouseX.set(e.pageX)}
             onMouseLeave={() => mouseX.set(Infinity)}
             className={cn(
-                "mx-auto hidden md:flex h-16 gap-4 items-end  rounded-2xl bg-neutral-900/80 border border-neutral-800 px-4 pb-3 backdrop-blur-md",
+                "mx-auto flex h-16 gap-4 items-end  rounded-2xl bg-neutral-900/80 border border-neutral-800 px-4 pb-3 backdrop-blur-md",
                 className
             )}
         >

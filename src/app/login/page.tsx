@@ -3,15 +3,17 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Lock, ArrowRight } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { supabase } from "@/lib/supabase";
+import { ensurePath } from "@/lib/utils";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,8 +37,13 @@ export default function LoginPage() {
             const res = await loginAction(email, password);
 
             if (res.success || !authError) {
+                // IMPORTANT: Set cookie on Client Side for Static Export compat
+                // Removed max-age to make it a Session Cookie (clears on browser close)
+                document.cookie = "admin_session=true; path=/; SameSite=Strict";
+
                 // If EITHER Supabase Auth worked OR Legacy Auth worked -> Redirect
-                router.push("/studio");
+                const nextUrl = searchParams.get("next") || "/studio";
+                router.push(nextUrl);
             } else {
                 setError(authError?.message || res.message || "Invalid Credentials");
             }
@@ -103,7 +110,7 @@ export default function LoginPage() {
 
 // Mock Server Action wrapper for this client file
 async function loginAction(email: string, pwd: string) {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(ensurePath('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email, password: pwd })

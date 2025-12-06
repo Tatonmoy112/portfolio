@@ -1,21 +1,43 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-    const path = request.nextUrl.pathname;
+    // 1. Identify if we are accessing a protected route
+    const { pathname } = request.nextUrl;
+    const isStudioRoute = pathname.startsWith('/studio');
 
-    // Protect /studio routes, but allow /studio/login
-    if (path.startsWith('/studio') && !path.startsWith('/studio/login')) {
-        const adminSession = request.cookies.get('admin_session');
+    // Note: Since login is now at /login, we don't strictly need to check isLoginRoute inside /studio
+    // But good to keep exclude logic if we expand.
+    const isLoginRoute = pathname === '/login';
 
-        if (!adminSession) {
-            return NextResponse.redirect(new URL('/studio/login', request.url));
-        }
+    // If it's not a studio route (or is the login route), do nothing
+    if (!isStudioRoute || isLoginRoute) {
+        return NextResponse.next();
     }
 
+    // 2. Check for the authentication cookie
+    // We use "admin_session" as defined in your login page logic
+    const isAuthenticated = request.cookies.has('admin_session');
+
+    // 3. If not authenticated, redirect to login with the return URL
+    if (!isAuthenticated) {
+        // Use clone() to ensure we keep the basePath (e.g. /portfolio)
+        const loginUrl = request.nextUrl.clone();
+        loginUrl.pathname = '/login';
+        // Add the current path as a "next" parameter to redirect back after login
+        loginUrl.searchParams.set('next', pathname);
+
+        return NextResponse.redirect(loginUrl);
+    }
+
+    // 4. If authenticated, allow the request to proceed
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: '/studio/:path*',
-}
+    matcher: [
+        // Apply to all routes under /studio
+        '/studio/:path*',
+    ],
+};

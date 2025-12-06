@@ -6,15 +6,20 @@ export const revalidate = 60;
 
 export default async function About() {
     // Parallel Data Fetching
-    const [
-        { data: profileData },
-        { data: educationData },
-        { data: expertiseData }
-    ] = await Promise.all([
-        supabase.from('personal_info').select('*').limit(1).single(),
-        supabase.from('education').select('*').order('id', { ascending: false }),
-        supabase.from('expertise').select('*').order('id')
-    ]);
+    let profileData, educationData, expertiseData;
+
+    try {
+        const results = await Promise.all([
+            supabase.from('personal_info').select('*').limit(1).single(),
+            supabase.from('education').select('*').order('id', { ascending: false }),
+            supabase.from('expertise').select('*').order('id')
+        ]);
+        profileData = results[0].data;
+        educationData = results[1].data;
+        expertiseData = results[2].data;
+    } catch (error) {
+        console.error("About Page Data Fetch Error:", error);
+    }
 
     // Data Transformation
     const profile = {

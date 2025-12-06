@@ -3,18 +3,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Github } from "lucide-react";
-import { StarsBackground } from "@/components/ui/stars-background";
-import { ShootingStars } from "@/components/ui/shooting-stars";
 
 export function ProjectsClient({ projects }: { projects: any[] }) {
     return (
         <div className="min-h-screen relative bg-neutral-950 overflow-hidden pt-20 pb-20 px-6">
 
-            {/* Background Ambience */}
-            <div className="absolute inset-0 bg-neutral-950 opacity-90 z-0">
-                <StarsBackground />
-                <ShootingStars />
-            </div>
+            {/* Background Ambience removed (moved to layout) */}
+
 
             <div className="relative z-10 max-w-6xl mx-auto">
                 <motion.div

@@ -5,7 +5,13 @@ import { ContactClient } from "@/components/contact-client";
 export const revalidate = 60;
 
 export default async function Contact() {
-    const { data: profileData } = await supabase.from('personal_info').select('*').limit(1).single();
+    let profileData;
+    try {
+        const { data } = await supabase.from('personal_info').select('*').limit(1).single();
+        profileData = data;
+    } catch (error) {
+        console.error("Contact Page Data Fetch Error:", error);
+    }
 
     const profile = {
         email: profileData?.email_contact || "",

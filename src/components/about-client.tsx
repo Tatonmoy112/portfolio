@@ -3,18 +3,14 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
-import { StarsBackground } from "@/components/ui/stars-background";
-import { ShootingStars } from "@/components/ui/shooting-stars";
+
 
 export function AboutClient({ profile, expertise, education }: any) {
     return (
         <div className="min-h-screen relative bg-neutral-950 overflow-hidden pt-24 pb-20 px-6">
 
-            {/* Background Ambience */}
-            <div className="absolute inset-0 bg-neutral-950 opacity-90 z-0">
-                <StarsBackground />
-                <ShootingStars />
-            </div>
+            {/* Background Ambience removed (moved to layout) */}
+
 
             <div className="relative z-10 max-w-5xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-16">

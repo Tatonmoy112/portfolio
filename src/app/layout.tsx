@@ -17,12 +17,14 @@ export const metadata: Metadata = {
   title: "TAT",
   description: "Portfolio of Tanvir Ahmed Tonmoy",
   icons: {
-    icon: "/Tanvir.jpg",
+    icon: "/portfolio/Tanvir.jpg",
   },
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConditionalFloatingDock } from "@/components/layout/conditional-floating-dock";
+import { StarsBackground } from "@/components/ui/stars-background";
+import { ShootingStars } from "@/components/ui/shooting-stars";
 
 export default function RootLayout({
   children,
@@ -41,7 +43,15 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <main className="min-h-screen relative w-full overflow-hidden bg-black">
-            {children}
+            {/* Global Background Ambience */}
+            <div className="fixed inset-0 bg-neutral-950/80 z-0 pointer-events-none">
+              <StarsBackground />
+              <ShootingStars />
+            </div>
+
+            <div className="relative z-10">
+              {children}
+            </div>
             <ConditionalFloatingDock />
           </main>
         </ThemeProvider>

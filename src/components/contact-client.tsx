@@ -3,8 +3,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Linkedin, Github, Phone, Facebook, Send, Loader2, CheckCircle2 } from "lucide-react";
-import { StarsBackground } from "@/components/ui/stars-background";
-import { ShootingStars } from "@/components/ui/shooting-stars";
 import { supabase } from "@/lib/supabase";
 
 export function ContactClient({ profile }: any) {
@@ -55,11 +53,8 @@ export function ContactClient({ profile }: any) {
     return (
         <div className="min-h-screen relative bg-neutral-950 overflow-hidden flex flex-col justify-center py-20 px-6">
 
-            {/* Background Ambience */}
-            <div className="absolute inset-0 bg-neutral-950 opacity-90 z-0">
-                <StarsBackground />
-                <ShootingStars />
-            </div>
+            {/* Background Ambience removed (moved to layout) */}
+
 
             <div className="relative z-10 max-w-4xl mx-auto w-full">
                 <motion.div

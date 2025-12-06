@@ -2,10 +2,9 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { StarsBackground } from "@/components/ui/stars-background";
-import { ShootingStars } from "@/components/ui/shooting-stars";
 import Link from "next/link";
 import { Download } from "lucide-react";
+import { cn, ensurePath } from "@/lib/utils";
 import {
     LocationWidget,
     TechStackWidget,
@@ -20,11 +19,8 @@ export function HomeClient({ profile, expertise, educationList, posts }: any) {
     return (
         <div className="min-h-screen w-full relative bg-neutral-950 overflow-x-hidden">
 
-            {/* Background Ambience */}
-            <div className="fixed inset-0 bg-neutral-950 opacity-90 z-0 pointer-events-none">
-                <StarsBackground />
-                <ShootingStars />
-            </div>
+            {/* Background Ambience removed (moved to layout) */}
+
 
             <div className="relative z-10 flex flex-col items-center pt-20 pb-40 px-4">
 
@@ -38,7 +34,7 @@ export function HomeClient({ profile, expertise, educationList, posts }: any) {
                     <div className="mb-8 relative group">
                         <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
                         <img
-                            src="/Tanvir.jpg"
+                            src={ensurePath("/Tanvir.jpg")}
                             alt={profile.name}
                             className="relative w-40 h-40 md:w-56 md:h-56 rounded-full object-cover object-top border-4 border-neutral-800 grayscale group-hover:grayscale-0 transition-all duration-500 shadow-2xl"
                             onError={(e) => {
@@ -61,7 +57,7 @@ export function HomeClient({ profile, expertise, educationList, posts }: any) {
                             View Projects
                         </Link>
                         <a
-                            href={profile?.resume_url || profile?.resumeUrl || "/resume.pdf"}
+                            href={ensurePath(profile?.resume_url || profile?.resumeUrl || "/resume.pdf")}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-8 py-3 bg-neutral-900 border border-neutral-800 text-white font-medium rounded-full hover:bg-neutral-800 transition-colors flex items-center gap-2 cursor-pointer"
@@ -120,7 +116,7 @@ export function HomeClient({ profile, expertise, educationList, posts }: any) {
                                     {/* Header */}
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10">
-                                            <img src="/Tanvir.jpg" alt="Profile" className="w-full h-full object-cover" onError={(e) => (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${profile?.name}&background=random`} />
+                                            <img src={ensurePath("/Tanvir.jpg")} alt="Profile" className="w-full h-full object-cover" onError={(e) => (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${profile?.name}&background=random`} />
                                         </div>
                                         <div>
                                             <h4 className="text-white font-bold text-sm">{profile?.name || "Tanvir Ahmed"}</h4>
@@ -138,7 +134,7 @@ export function HomeClient({ profile, expertise, educationList, posts }: any) {
                                     {/* Image Attachment */}
                                     {post.image && (
                                         <div className="w-full h-48 rounded-2xl overflow-hidden border border-neutral-800 bg-black/50 mt-auto">
-                                            <img src={post.image} alt="Post Attachment" className="w-full h-full object-cover" />
+                                            <img src={ensurePath(post.image)} alt="Post Attachment" className="w-full h-full object-cover" />
                                         </div>
                                     )}
                                 </div>

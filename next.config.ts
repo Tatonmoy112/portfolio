@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  // output: 'export', // Keep disabled for local dev so API routes work!
+  trailingSlash: true,
   basePath: '/portfolio',
   images: {
     unoptimized: true,

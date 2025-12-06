@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { Save, LogOut, User, Briefcase, FileText, Loader2, RefreshCw, Menu, X, LayoutDashboard, Mail, Upload, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import portfolioData from "@/data/portfolio-data.json";
 import { supabase } from "@/lib/supabase";
 import { uploadToImgBB } from "@/lib/imgbb";
+import { ensurePath } from "@/lib/utils";
 
 export default function StudioPage() {
     const [activeTab, setActiveTab] = useState("profile");
@@ -14,10 +16,8 @@ export default function StudioPage() {
     const [loading, setLoading] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    // Fetch data from Supabase on mount
-    useEffect(() => {
-        fetchData();
-    }, []);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const router = useRouter();
 
     const fetchData = async () => {
         // ... (existing fetch logic remains same) ...
@@ -81,6 +81,68 @@ export default function StudioPage() {
         }
     };
 
+    // Check Auth on Mount
+    useEffect(() => {
+        const checkAuth = async () => {
+            // 1. Check for cookie (simple client-side check for static site)
+            const hasCookie = document.cookie.includes("admin_session=true");
+
+            // 2. Check for Supabase session
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!hasCookie && !session) {
+                router.push("/login");
+            } else {
+                setIsAuthenticated(true);
+                fetchData();
+            }
+        };
+        checkAuth();
+    }, []);
+
+    // 3. Idle Timeout Logic
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        let timeoutId: NodeJS.Timeout;
+        const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 minutes
+
+        const resetTimer = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                alert("Session timed out due to inactivity.");
+                handleLogout();
+            }, TIMEOUT_DURATION);
+        };
+
+        // Events to track activity
+        const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+
+        // Attach listeners
+        const handleActivity = () => resetTimer();
+        events.forEach(event => window.addEventListener(event, handleActivity));
+
+        // Start timer
+        resetTimer();
+
+        // Cleanup
+        return () => {
+            clearTimeout(timeoutId);
+            events.forEach(event => window.removeEventListener(event, handleActivity));
+        };
+    }, [isAuthenticated]);
+
+    // Prevent flashing content before auth check
+    if (!isAuthenticated) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-neutral-500 animate-spin" />
+            </div>
+        );
+    }
+
+
+
     // ... (handleSave remains same) ...
     const handleSave = async () => {
         setSaving(true);
@@ -127,7 +189,7 @@ export default function StudioPage() {
                 date: p.date
             }));
 
-            const response = await fetch('/api/admin/save', {
+            const response = await fetch(ensurePath('/api/admin/save'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -163,8 +225,8 @@ export default function StudioPage() {
     };
     const handleLogout = async () => {
         try {
-            await fetch('/api/auth/logout', { method: 'POST' });
-            window.location.href = '/studio/login';
+            await fetch(ensurePath('/api/auth/logout'), { method: 'POST' });
+            window.location.href = ensurePath('/login');
         } catch (error) {
             console.error("Logout failed", error);
         }
@@ -290,7 +352,7 @@ export default function StudioPage() {
                                                         formData.append("file", file);
 
                                                         try {
-                                                            const res = await fetch("/api/upload/cv", {
+                                                            const res = await fetch(ensurePath("/api/upload/cv"), {
                                                                 method: "POST",
                                                                 body: formData,
                                                             });
