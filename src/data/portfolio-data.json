@@ -1,0 +1,75 @@
+{
+    "profile": {
+        "name": "Tanvir Ahmed",
+        "role": "Full Stack Developer",
+        "bio": "Ambitious ITM Undergraduate blending technical proficiency with management insight. Skilled in developing functional digital solutions across mobile and web platforms.",
+        "location": "Dhaka, Bangladesh",
+        "email": "tatonmoy112@gmail.com",
+        "phone": "+8801791116481",
+        "github": "github.com/tonmoy",
+        "linkedin": "linkedin.com/in/tanvir-ahmed-tonmoy",
+        "resumeUrl": "/resume.pdf"
+    },
+    "stats": {
+        "cgpa": "3.52",
+        "degree": "B.Sc. in ITM",
+        "university": "Daffodil International University",
+        "gradYear": "2026"
+    },
+    "expertise": [
+        {
+            "category": "Frontend",
+            "skills": [
+                "React",
+                "Next.js",
+                "Tailwind CSS",
+                "Framer Motion"
+            ]
+        },
+        {
+            "category": "Backend",
+            "skills": [
+                "Node.js",
+                "Supabase",
+                "PostgreSQL"
+            ]
+        },
+        {
+            "category": "Tools",
+            "skills": [
+                "Git",
+                "Figma",
+                "VS Code"
+            ]
+        }
+    ],
+    "projects": [
+        {
+            "id": "1",
+            "title": "Red Shift Console",
+            "category": "UI/UX & Web Design",
+            "description": "A bold, red-themed marketplace interface concept designed in Figma. Features complex layout strategies and modern e-commerce visuals.",
+            "image": "/project1.jpg",
+            "link": "/projects/red-shift",
+            "githubUrl": "https://github.com/tonmoy/red-shift"
+        },
+        {
+            "id": "2",
+            "title": "ITM Dept App",
+            "category": "Mobile Application (Flutter)",
+            "description": "Cross-platform app designed to simplify information access for users (routine, notices).",
+            "image": "/project2.jpg",
+            "link": "/projects/app",
+            "githubUrl": "https://github.com/tonmoy/itm-app"
+        },
+        {
+            "id": "3",
+            "title": "E-Com Platform",
+            "category": "Full Stack Web",
+            "description": "Secure Business Verification & Marketplace Management Platform with admin panels.",
+            "image": "/project3.jpg",
+            "link": "/projects/ecom",
+            "githubUrl": "https://github.com/tonmoy/ecom-platform"
+        }
+    ]
+}
