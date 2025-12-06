@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: 'export', // Keep disabled for local dev so API routes work!
+  output: process.env.NODE_ENV === 'production' ? 'export' : undefined, // Export for GitHub Pages, but unused for dev so APIs work
   trailingSlash: true,
   basePath: '/portfolio',
   images: {

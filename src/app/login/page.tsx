@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Lock, ArrowRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { ensurePath } from "@/lib/utils";
 
-export default function LoginPage() {
+function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -26,30 +26,46 @@ export default function LoginPage() {
                 password
             });
 
+            let legacySuccess = false;
+            let legacyMessage = "";
+
             if (authError) {
-                // Fallback: If auth fails, try Legacy Env Password check via Server
-                // This supports the "password only" mode if user hasn't set up Auth users properly yet
-                console.warn("Supabase Auth failed, trying legacy:", authError.message);
+                console.warn("Supabase Auth failed:", authError.message);
+
+                // Fallback attempt (Legacy)
+                // We wrap this in a TRY/CATCH to ensure it never crashes the main flow
+                try {
+                    const res = await loginAction(email, password);
+                    if (res.success) {
+                        legacySuccess = true;
+                    } else {
+                        // Store legacy message but don't show yet
+                        legacyMessage = res.message || "Legacy auth failed";
+                    }
+                } catch (legacyEx: any) {
+                    console.warn("Legacy Auth Exception:", legacyEx);
+                    // Expected on GitHub Pages, so we just ignore this crash and rely on authError
+                }
             }
 
-            // 2. Server-Side Cookie (Satisfies Middleware)
-            // We pass credentials to verify on server too (or just to set cookie)
-            const res = await loginAction(email, password);
-
-            if (res.success || !authError) {
-                // IMPORTANT: Set cookie on Client Side for Static Export compat
-                // Removed max-age to make it a Session Cookie (clears on browser close)
+            // Success Condition: Either Supabase worked (no error) OR Legacy worked
+            if (!authError || legacySuccess) {
+                // Set Cookie
                 document.cookie = "admin_session=true; path=/; SameSite=Strict";
 
-                // If EITHER Supabase Auth worked OR Legacy Auth worked -> Redirect
-                const nextUrl = searchParams.get("next") || "/studio";
+                // Redirect
+                const nextUrl = searchParams.get("next") || "/login/studio";
                 router.push(nextUrl);
             } else {
-                setError(authError?.message || res.message || "Invalid Credentials");
+                // Failure Condition
+                // Show the specific error message to the user!
+                setError(authError?.message || legacyMessage || "Invalid Credentials");
             }
 
         } catch (err: any) {
-            setError("Login failed. Please try again.");
+            // CRITICAL: We now show the actual crash error to the user
+            console.error("Critical Login Error:", err);
+            setError("App Error: " + (err.message || String(err)));
         }
     };
 
@@ -91,10 +107,14 @@ export default function LoginPage() {
                     </div>
 
                     {error && (
-                        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg break-words">
                             <p className="text-red-400 text-xs text-center font-medium">{error}</p>
                         </div>
                     )}
+
+                    <div className="text-xs text-center text-neutral-600">
+                        {process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("placeholder") ? "⚠️ Demo Mode: Login might fail without keys" : "Connected to Supabase"}
+                    </div>
 
                     <button
                         type="submit"
@@ -108,13 +128,33 @@ export default function LoginPage() {
     );
 }
 
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+            <LoginForm />
+        </Suspense>
+    );
+}
+
 // Mock Server Action wrapper for this client file
 async function loginAction(email: string, pwd: string) {
-    const response = await fetch(ensurePath('/api/auth/login'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: pwd })
-    });
-    const data = await response.json();
-    return { success: response.ok, message: data.message };
+    try {
+        const response = await fetch(ensurePath('/api/auth/login'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: pwd })
+        });
+
+        // On GitHub Pages, API routes return 404 HTML, which causes .json() to crash.
+        // We must check .ok first.
+        if (!response.ok) {
+            return { success: false, message: `Server Error: ${response.status}` };
+        }
+
+        const data = await response.json();
+        return { success: response.ok, message: data.message };
+    } catch (e: any) {
+        // Network errors or fetch failures
+        return { success: false, message: e.message || "Network Error" };
+    }
 }

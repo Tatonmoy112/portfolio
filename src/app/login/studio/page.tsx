@@ -20,7 +20,6 @@ export default function StudioPage() {
     const router = useRouter();
 
     const fetchData = async () => {
-        // ... (existing fetch logic remains same) ...
         setLoading(true);
         try {
             const { data: profileData } = await supabase.from('personal_info').select('*').limit(1).single();
@@ -84,17 +83,43 @@ export default function StudioPage() {
     // Check Auth on Mount
     useEffect(() => {
         const checkAuth = async () => {
-            // 1. Check for cookie (simple client-side check for static site)
-            const hasCookie = document.cookie.includes("admin_session=true");
+            try {
+                // 1. Check for cookie (Legacy/Localhost support)
+                const hasCookie = document.cookie.includes("admin_session=true");
 
-            // 2. Check for Supabase session
-            const { data: { session } } = await supabase.auth.getSession();
+                // 2. Check for Supabase session (Primary for Static Site)
+                const { data: { session } } = await supabase.auth.getSession();
 
-            if (!hasCookie && !session) {
+                // 3. Strict Check based on Environment
+                const isStaticHost = window.location.hostname.includes("github.io");
+
+                let isAuthorized = false;
+
+                if (isStaticHost) {
+                    // On GitHub Pages, we CANNOT trust the cookie alone (no server to verify).
+                    // We MUST have a valid Supabase session.
+                    if (session) {
+                        isAuthorized = true;
+                    }
+                } else {
+                    // On Localhost, allow either (Legacy Password OR Supabase)
+                    if (hasCookie || session) {
+                        isAuthorized = true;
+                    }
+                }
+
+                if (!isAuthorized) {
+                    // Redirect if not authorized
+                    console.warn("Unauthorized access attempt. Redirecting to login.");
+                    router.push("/login?next=/login/studio");
+                } else {
+                    // Success
+                    setIsAuthenticated(true);
+                    fetchData();
+                }
+            } catch (err) {
+                console.error("Auth Check Error:", err);
                 router.push("/login");
-            } else {
-                setIsAuthenticated(true);
-                fetchData();
             }
         };
         checkAuth();

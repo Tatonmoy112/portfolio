@@ -1,18 +1,15 @@
-
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
     // 1. Identify if we are accessing a protected route
     const { pathname } = request.nextUrl;
-    const isStudioRoute = pathname.startsWith('/studio');
 
-    // Note: Since login is now at /login, we don't strictly need to check isLoginRoute inside /studio
-    // But good to keep exclude logic if we expand.
-    const isLoginRoute = pathname === '/login';
+    // We want to protect /studio AND /login/studio
+    const isProtected = pathname.startsWith('/studio') || pathname.startsWith('/login/studio');
 
-    // If it's not a studio route (or is the login route), do nothing
-    if (!isStudioRoute || isLoginRoute) {
+    // If it's not a protected route, do nothing
+    if (!isProtected) {
         return NextResponse.next();
     }
 
@@ -37,7 +34,8 @@ export function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        // Apply to all routes under /studio
+        // Apply to all routes under /studio and /login/studio
         '/studio/:path*',
+        '/login/studio/:path*'
     ],
 };

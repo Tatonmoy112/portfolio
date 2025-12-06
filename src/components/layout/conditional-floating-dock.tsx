@@ -6,7 +6,7 @@ import { Home, Briefcase, User, Mail } from "lucide-react";
 
 export function ConditionalFloatingDock() {
     const pathname = usePathname();
-    const isStudio = pathname?.startsWith("/studio");
+    const isStudio = pathname?.startsWith("/studio") || pathname?.startsWith("/login/studio");
     const isLogin = pathname?.startsWith("/login");
 
     if (isStudio || isLogin) return null;
